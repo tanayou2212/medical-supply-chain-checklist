@@ -1,55 +1,60 @@
-# サプライチェーンリスク評価チェックリスト生成ツール
+# Supply Chain Risk Assessment Checklist Generator
 
-部品カテゴリを入力するだけで、調達リスク評価用のチェックリストをMarkdown形式で出力するツールです。
-
----
-
-## 機能
-
-- 部品カテゴリに応じたリスク評価チェックリストを自動生成
-- カテゴリ固有の項目 ＋ 共通項目を組み合わせて出力
-- Markdown形式で画面表示 ＋ ファイル保存が可能
-
-### 対応リスク区分
-
-| リスク区分 | 内容 |
-|-----------|------|
-| 調達先の地域集中リスク | 特定国・地域への依存度 |
-| 単一サプライヤー依存リスク | サプライヤー数と財務健全性 |
-| 輸送ルートリスク | 代替ルート・関税リスク |
-| 代替調達先の有無 | 代替品の認定状況 |
-| 在庫・リードタイムリスク | 安全在庫・調達リードタイム |
+A tool that automatically generates procurement risk assessment checklists in Markdown format by entering a component category. Includes automatic numerical risk scoring.
 
 ---
 
-## 使い方
+## Features
 
-### 必要環境
+- Generates risk assessment checklists tailored to the component category
+- Combines category-specific items with common items
+- **Automatic numerical risk scoring** — answer y/n for each item to get a weighted total score (0–100)
+- Displays output in Markdown and optionally saves to a file
 
-- Python 3.8 以上（追加ライブラリのインストール不要）
+### Risk Areas Covered
 
-### 実行方法
+| Risk Area | Description |
+|-----------|-------------|
+| Geographic Concentration Risk | Dependency on specific countries or regions |
+| Single-Supplier Dependency Risk | Number of suppliers and their financial health |
+| Transportation Route Risk | Alternative routes and tariff/customs risks |
+| Alternative Sourcing | Qualification status of alternative suppliers |
+| Inventory & Lead Time Risk | Safety stock levels and procurement lead times |
 
-**方法1：インタラクティブ（対話形式）**
+---
+
+## Requirements
+
+- Python 3.8 or later (no additional libraries required)
+
+---
+
+## Usage
+
+### Method 1: Interactive mode
 
 ```bash
 python supply_chain_checklist.py
 ```
 
-実行後、カテゴリ名を入力するよう促されます。
+You will be prompted to enter a category name, then choose whether to calculate a risk score.
 
 ```
 ==================================================
-サプライチェーンリスク評価チェックリスト生成ツール
+Supply Chain Risk Assessment Checklist Generator
 ==================================================
 
-対応カテゴリ例：半導体、センサー、電子部品
-  （上記以外のカテゴリも入力可能です）
+Supported categories: Semiconductors, Sensors, Electronic Components
+  (Other categories are also accepted)
 
-部品カテゴリを入力してください: 半導体
+Enter component category: Semiconductors
+
+Calculate risk score automatically? (y/n): y
 ```
 
-**方法2：コマンドライン引数で指定**
+If you choose `y`, the tool walks through every checklist item and asks you to answer `y` (addressed) or `n` (not addressed). A numerical score is computed at the end.
+
+### Method 2: Command-line argument
 
 ```bash
 python supply_chain_checklist.py 半導体
@@ -60,72 +65,119 @@ python supply_chain_checklist.py パワーデバイス
 
 ---
 
-## 出力例
+## Risk Scoring
+
+Each checklist item is answered as:
+
+| Answer | Meaning | Risk contribution |
+|--------|---------|-------------------|
+| `y` | Addressed | None |
+| `n` | Not addressed | Increases score |
+
+**Area score** = (number of "n" answers ÷ total items) × 100
+
+**Total score** = weighted average of all area scores
+
+| Risk Area | Weight |
+|-----------|--------|
+| Geographic Concentration Risk | 25% |
+| Single-Supplier Dependency Risk | 25% |
+| Alternative Sourcing | 20% |
+| Transportation Route Risk | 15% |
+| Inventory & Lead Time Risk | 15% |
+
+**Score interpretation:**
+
+| Score | Level |
+|-------|-------|
+| 0 – 30 | Low |
+| 31 – 60 | Medium |
+| 61 – 100 | High |
+
+---
+
+## Sample Output
 
 ```markdown
-# サプライチェーンリスク評価チェックリスト
+# Supply Chain Risk Assessment Checklist
 
-**対象カテゴリ：** 半導体
-**作成日：** 2026年04月28日
+**Category:** Semiconductors
+**Date:** 2026-05-07
 
 ---
 
-## 調達先の地域集中リスク
+## Risk Score Summary
 
-- [ ] 台湾・韓国・日本への製造集中度を確認したか
-- [ ] 地政学的リスク（台湾海峡情勢）が調達に与える影響を評価したか
+**Total Risk Score: 42.3 / 100  (Medium)**
+
+| Risk Area | Score | Level | Not Addressed / Total |
+|-----------|-------|-------|-----------------------|
+| Geographic Concentration Risk | 50.0 | Medium | 4 / 8 |
+| Single-Supplier Dependency Risk | 33.3 | Medium | 2 / 6 |
+| Transportation Route Risk | 50.0 | Medium | 3 / 6 |
+| Alternative Sourcing | 25.0 | Low | 2 / 8 |
+| Inventory & Lead Time Risk | 40.0 | Medium | 4 / 10 |
+
+---
+
+## Geographic Concentration Risk
+
+- [ ] Confirmed degree of manufacturing concentration in Taiwan, South Korea, and Japan
+- [ ] Assessed the impact of geopolitical risks (Taiwan Strait situation) on procurement
 ...
 
-## 総合評価
+## Overall Assessment
 
-| リスク区分 | 評価（高・中・低） | 対応策・コメント |
-|-----------|-----------------|----------------|
-| 調達先の地域集中リスク | | |
+| Risk Area | Assessment (High / Medium / Low) | Action / Comment |
+|-----------|----------------------------------|-----------------|
+| Geographic Concentration Risk | Medium | |
 ...
+
+**Total Risk Level:** Medium (Score: 42.3)
 ```
 
-実行後に `y` を押すと、以下の形式でファイルが保存されます。
+After the checklist is displayed, press `y` to save it as a file:
 
 ```
-checklist_半導体_20260428_143022.md
+checklist_半導体_20260507_143022.md
 ```
 
 ---
 
-## 対応カテゴリ一覧
+## Supported Categories
 
-以下のカテゴリはカテゴリ固有の詳細項目が追加されます。
+The following categories include detailed category-specific checklist items. Other inputs will display common items only.
 
-| カテゴリ | 認識されるキーワード |
-|--------|------------------|
-| 半導体 | 半導体、IC、チップ、LSI、マイコン、CPU、GPU、FPGA、メモリ |
-| センサー | センサー、センサ、sensor、検出器、検知器 |
-| 電子部品 | 電子部品、部品、コンデンサ、抵抗、コイル、MLCC、受動部品、能動部品 |
-
-上記以外のカテゴリを入力した場合は、共通チェック項目のみ出力されます。
+| Category | Recognized Keywords |
+|----------|---------------------|
+| Semiconductors | 半導体, IC, チップ, LSI, マイコン, CPU, GPU, FPGA, メモリ |
+| Sensors | センサー, センサ, sensor, 検出器, 検知器 |
+| Electronic Components | 電子部品, 部品, コンデンサ, 抵抗, コイル, MLCC, 受動部品, 能動部品 |
 
 ---
 
-## ファイル構成
+## File Structure
 
 ```
 business-automation/
-├── supply_chain_checklist.py   # メインスクリプト
-├── README.md                   # このファイル
-└── checklist_*.md              # 生成されたチェックリスト（実行後に作成）
+├── supply_chain_checklist.py   # Main script
+├── README.md                   # This file (English)
+├── README_ja.md                # Japanese version
+└── checklist_*.md              # Generated checklists (created at runtime)
 ```
 
 ---
 
-## カスタマイズ方法
+## Customization
 
-スクリプト内の以下の辞書を編集することで、チェック項目を追加・変更できます。
+Edit the following dictionaries in the script to add or modify checklist items:
 
-- **`CATEGORY_SPECIFIC_ITEMS`**：カテゴリ別の固有チェック項目
-- **`COMMON_ITEMS`**：全カテゴリ共通のチェック項目
-- **`CATEGORY_ALIASES`**：カテゴリ名の別名定義
+- **`CATEGORY_SPECIFIC_ITEMS`** — Category-specific checklist items
+- **`COMMON_ITEMS`** — Common items applied to all categories
+- **`CATEGORY_ALIASES`** — Keyword aliases for category recognition
+- **`RISK_WEIGHTS`** — Weight assigned to each risk area (must sum to 1.0)
 
-例：「バッテリー」カテゴリを追加する場合は、`CATEGORY_SPECIFIC_ITEMS` に以下を追加します。
+Example: to add a "Battery" category, add the following to `CATEGORY_SPECIFIC_ITEMS`:
 
 ```python
 "バッテリー": {
@@ -139,6 +191,6 @@ business-automation/
 
 ---
 
-## 問い合わせ
+## Contact
 
-ご不明点は社内担当者までご連絡ください。
+For questions, please contact the internal person in charge.
